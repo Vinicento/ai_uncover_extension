@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ONNX.js Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/onnxjs/dist/onnx.min.js"></script>
+</head>
+<body>
+    <!-- Load ONNX.js -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxjs/dist/onnx.min.js"></script>
+    <!-- Code that consume ONNX.js -->
+    <div>
+        <button onclick="predict()">Predict</button> <!-- Button to trigger prediction -->
+    </div>
+    <div>
+        <label id="outputLabel"></label> <!-- Label to display the output -->
+    </div>
+
+    <script>
+        // Define a function to create model inputs
+        function getInputs() {
+            // Generate model input data (replace with your actual input data)
+            const inputData = new Float32Array(3 * 32 * 32).fill(1); // Example random input data
+            // Create Tensor from input data
+            const tensor = new onnx.Tensor(inputData, 'float32', [1, 3, 32, 32]);
+            return [tensor];
+        }
+
+        // Create a session
+        const myOnnxSession = new onnx.InferenceSession();
+
+        // Load the ONNX model file
+        myOnnxSession.loadModel("model.onnx").then(() => {
+            console.log("Model loaded successfully."); // Log model loading success
+        });
+
+        // Function to perform prediction
+        function predict() {
+            // Generate model input
+            const inferenceInputs = getInputs();
+
+            // Execute the model
+            myOnnxSession.run(inferenceInputs).then((output) => {
+                // Consume the output
+                const outputTensor = output.values().next().value;
+
+                // Get the output data from the tensor
+                const outputData = outputTensor.data;
+
+                // Display the output in the HTML label
+                document.getElementById("outputLabel").innerText = `Model output tensor: ${outputData}.`;
+            });
+        }
+    </script>
+</body>
+</html>
